@@ -5,13 +5,12 @@ import "./styles.css";
 
 function App() {
   const [repositories, setRepositories] = useState([]);
-  const [statusDelete, setStatusDelete] = useState(false);
 
   useEffect(() => {
     api.get('repositories').then(response => {
       setRepositories(response.data);
     });
-  }, [statusDelete]);
+  }, []);
 
   async function handleAddRepository() {
     const response = await api.post('repositories', { 
@@ -20,27 +19,30 @@ function App() {
       "techs" : ["Node.js", "..."]
     });
 
-    const repositorie = response.data;
+    const repository = response.data;
 
-    setRepositories([...repositories, repositorie]);
+    setRepositories([...repositories, repository]);
   }
 
   async function handleRemoveRepository(id) {
     const response = await api.delete(`repositories/${id}`);
 
     if(response.status == 204){
-      setStatusDelete(!statusDelete);
+      const repositoryIndex = repositories.findIndex((response) => response.id === id);
+      repositories.splice(repositoryIndex, 1);
+  
+      setRepositories([...repositories]);
     }
   }
 
   return (
     <div>
       <ul data-testid="repository-list">
-      {repositories.map(repositorie => 
-        <li key={repositorie.id}>
-          {repositorie.title}
+      {repositories.map(repository => 
+        <li key={repository.id}>
+          {repository.title}
 
-          <button onClick={() => handleRemoveRepository(repositorie.id)}>
+          <button onClick={() => handleRemoveRepository(repository.id)}>
             Remover
           </button>
         </li>
